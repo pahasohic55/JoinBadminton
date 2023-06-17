@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>發起揪團</title>
+<!-- 響應式網站 -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Boostrap 導入程式 -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+	crossorigin="anonymous">
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+	integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+	crossorigin="anonymous"></script>
+<!-- 連結CSS外部檔案 -->
+<link rel="stylesheet" href="./css/post.css">
+<link rel="stylesheet" href="./css/navbar&footer.css">
+<!-- MDB頭像 -->
+<script type="text/javascript" src="./Js/mdb.min.js"></script>
+
+<!-- 連結Js外部檔案 -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="./Js/index.js"></script>
+<script src="./Js/tw-city-selector.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+.test-object-normal {
+	display: inline;
+}
+</style>
+<script>
+	$(function(){
+		if (checkloginstatus() === "1") {
+			let memberObj = sessionStorage.getItem('member');
+			let member = JSON.parse(memberObj);
+			console.log(member.id);
+			console.log(member.Icon);
+			if(member.Icon){
+				$("#Icon").attr("src", member.Icon); 
+			};
+			$("#dropdown-menu li").eq(0).find("a").html("會員資料");
+			$("#dropdown-menu li").eq(0).find("a").attr("href", "./member.html")
+			$("#dropdown-menu li").eq(1).find("a").html("活動");
+			$("#dropdown-menu li").eq(1).find("a").attr("href", "#")
+			$("#dropdown-menu li").eq(1).after("<li><a class='dropdown-item' href='./Logout' onclick='logout()'>登出</a></li>");
+		}
+	})
+
+	function checkloginstatus() {
+		console.log("sessionStorage.getItem(isLogin)前")
+		let isLogin = sessionStorage.getItem("isLogin");
+		if (isLogin === "1") {
+			console.log("sessionStorage.getItem(isLogin)中1")
+			return "1";
+
+		} else {
+			console.log("sessionStorage.getItem(isLogin)中2")
+			return "0";
+		}
+		console.log("sessionStorage.getItem(isLogin)後")
+	}
+
+
+	function logout() {		
+		sessionStorage.removeItem("isLogin");
+		sessionStorage.removeItem("member");
+		$("#Icon").attr("src", "./Images/user.png");
+		$("#dropdown-menu li").eq(0).find("a").html("登入");
+		$("#dropdown-menu li").eq(0).find("a").attr("href", "./getLogin");
+		$("#dropdown-menu li").eq(1).find("a").html("註冊");
+		$("#dropdown-menu li").eq(1).find("a").attr("href", "./getLogin");
+		$("#dropdown-menu li").eq(2).revome();
+	}
+
+    function showPic(){
+		console.log(event);
+		let file=$("#file")[0].files[0];
+		if(file.type.startsWith('image/jepg')||file.type.startsWith('image/jpg')||file.type.startsWith('image/jpe')){
+			if(file && file.size < 1024*2*1024){
+				let reader = new FileReader;
+// 				alert("至換前")
+				reader.onload = function(e) {
+				    $('#Pic').attr('src', e.target.result);
+				  };
+				  reader.readAsDataURL(file);
+// 				  alert("至換後")
+			}else{
+				Swal.fire({
+                    title: "檔案限制2MB以下，請重新選擇",
+                    icon: 'warning',
+                    showCloseButton: true,
+                    confirmButtonText: '關閉'
+                  });
+				$("#file").val('');
+			}
+		}else{
+			Swal.fire({
+                title: "只支援jepg、jpg、jpe等檔案類型",
+                icon: 'warning',
+                showCloseButton: true,
+                confirmButtonText: '關閉'
+              });
+			$("#file").val('');
+		}
+    }
+    
+    function checkmin(){
+    	let min = parseInt($("#min").val());
+    	console.log(min);
+    	console.log(typeof min);
+    	if(min<2){
+    		Swal.fire({
+                title: "最低人數至少為2人",
+                icon: 'warning',
+                showCloseButton: true,
+                confirmButtonText: '關閉'
+              });
+    		$("#min").val(2);            
+    	}    	
+    }
+    
+    function checkmax(){
+    	let min = parseInt($("#min").val());
+    	let max = parseInt($("#max").val());
+    	console.log(max);
+    	console.log(typeof max);
+    	if(max < min){
+    		Swal.fire({
+                title: "人數上限必須大於最低人數",
+                icon: 'warning',
+                showCloseButton: true,
+                confirmButtonText: '關閉'
+              });
+    		$("#max").val($("#min").val());
+    	}
+    }
+    
+    function checkactivityTime(){
+    	let d = new Date();
+    	let today = d.getFullYear() + "-" + ((d.getMonth()+1 < 10)?  '0' + (d.getMonth()+1):(d.getMonth()+1))+ "-" + ((d.getDate() <10) ? '0' + d.getDate() : d.getDate()); 
+    	console.log(d);
+    	console.log(today);
+    	if($("#activityTime").val() < today){
+    		Swal.fire({
+                title: "活動時間不能晚於今天",
+                icon: 'warning',
+                showCloseButton: true,
+                confirmButtonText: '關閉'
+              });
+    		$("#activityTime").val('');
+    	}
+    }
+    
+    function checkdeadline(){
+    	if($("#deadline").val() > $("#activityTime").val()){
+    		Swal.fire({
+                title: "最晚審核時間不能活動時間",
+                icon: 'warning',
+                showCloseButton: true,
+                confirmButtonText: '關閉'
+              });
+    		$("#deadline").val('');
+    	}
+    }
+
+    function uploadPic(acticityId){
+        let file=$("#file")[0].files[0];
+        if(file !== undefined){
+            let formData = new FormData();        
+            formData.append("id",acticityId);
+            formData.append("Pic",file)
+
+            console.log(typeof formData);
+            for (let pair of formData.entries()) {
+			    console.log(pair[0] + ': ' + pair[1]);
+            }
+            $.post({
+                url:"ActivityPic",
+                data:formData,			
+                processData: false,
+                contentType: false,
+                success:function(data){
+                	Swal.fire({
+                        title: "活動圖片上傳成功",
+                        icon: 'success',
+                        showCloseButton: true,
+                        confirmButtonText: '關閉'
+                      });
+                    
+                }
+		    });
+            window.location.href="./index.html"
+        }
+        
+    }
+    
+    function checkNoBlank(){
+    	let location = $("select[name='county']").val()+$("select[name='district']").val()+$("#location").val()
+    	console.log(location);
+        let blankinput = $(".container-post").find("input").not(".chooseone input").not("#file").add("select").add("textarea").filter(function(){
+            return $.trim($(this).val()) === ''
+        })
+        if(blankinput.length !==0){
+        	Swal.fire({
+                title: "請輸入全部的值",
+                icon: 'warning',
+                showCloseButton: true,
+                confirmButtonText: '關閉'
+              })
+        	blankinput.first().focus();
+			return false;
+            
+            
+        }
+        let isBlankRadio = $('input[name="inlineRadioOptions"]:checked').length === 0;
+        if(isBlankRadio){
+        	Swal.fire({
+                title: "請選擇是否已預約",
+                icon: 'warning',
+                showCloseButton: true,
+                confirmButtonText: '關閉'
+              });
+            return false;
+        }
+        
+        let isBlankCheckbox = $("input[name='level']:checked").map(function(){
+                     return $(this).val();
+                    }).get().length == 0;
+       if(isBlankCheckbox){
+    	   Swal.fire({
+               title: "請選擇等級",
+               icon: 'warning',
+               showCloseButton: true,
+               confirmButtonText: '關閉'
+             });
+            return false;
+       }
+
+       return true;
+    }
+
+    function postActivity(){
+        let memberObj = sessionStorage.getItem('member');
+        let member = JSON.parse(memberObj);
+        let location = $("select[name='county']").val()+$("select[name='district']").val()+$("#location").val(); 
+        let d = new Date();
+    	let today = d.getFullYear() + "-" + ((d.getMonth()+1 < 10)?  '0' + (d.getMonth()+1):(d.getMonth()+1))+ "-" + ((d.getDate() <10) ? '0' + d.getDate() : d.getDate());
+        if(checkNoBlank()){
+//             alert("開始送出資料");
+            $.post("./PostActivity",{
+                host:member.id,
+                activityTitle:$("#activityTitle").val(),       
+                description:$('#description').val(),
+                location:location,
+                activityTime:$('#activityTime').val(),
+                fee:$('#fee').val(),
+                min:$('#min').val(),
+                max:$('#max').val(),
+                reservation:$('input[name="inlineRadioOptions"]:checked').val(),
+                contact:$('#contact').val(),
+                level:$("input[name='level']:checked").map(function(){return $(this).val();
+                      }).get().join(','),
+                expired:"N",
+                postTime:today,
+                deadline:($('#deadline').val() ==''? $('#activityTime').val():$('#deadline').val() )
+            },
+            function(data,status,jqXHR){
+            	Swal.fire({
+                    title: "新增成功",
+                    icon: 'success',
+                    showCloseButton: true,
+                    confirmButtonText: '關閉'
+                  });
+                console.log(data);
+                console.log(typeof data);
+                console.log(data.id);
+                uploadPic(data.id);
+            })
+        }
+    }
+
+    
+    </script>
+</head>
+
+<body>
+	<!-- 導覽列 -->
+	<header class="main-header">
+		<div class="container">
+			<a href="./index.html" class="Logo"> <img
+				src="./Images/logo3.png" alt="Logo" width="30" height="36">
+				<h2 id="custom-h2">Join</h2>
+			</a>
+			<!-- 導覽列文字 -->
+			<nav class="navbar-text">
+				<a href="./latestNews.html">最新消息</a> <a href="./findGym.html">附近場館</a>
+				<a href="./post.html">發起揪團</a> <a href="./joinTeam.html">加入報團</a>
+			</nav>
+			<nav class="navbar navbar-expand-lg">
+				<div class="container-fluid">
+					<ul class="navbar-nav">
+						<!-- Avatar頭像 -->
+						<li class="nav-item Avatar dropdown"><a
+							class="nav-link dropdown-toggle d-flex align-items-center"
+							href="#" id="navbarDropdownMenuLink" role="button"
+							data-mdb-toggle="dropdown" aria-expanded="false"> <img
+								src="./Images/user.png" class="rounded-circle" 
+								id="Icon" width="50" height="50" alt="Portrait of a Woman" loading="lazy" />
+						</a>
+							<ul class="dropdown-menu" id="dropdown-menu"
+								aria-labelledby="navbarDropdownMenuLink">
+								<li><a class="dropdown-item" href="./getLogin">登入</a></li>
+								<li><a class="dropdown-item" href="./getLogin">註冊</a></li>
+							</ul></li>
+					</ul>
+				</div>
+			</nav>
+		</div>
+	</header>
+	<!-- 揪團框 -->
+	<div class="container-post">
+		<!-- 團名 -->
+		<div class="GroupName">
+			<input type="text" placeholder="  團名 : 活動名稱  " class="activityTitle"
+				id="activityTitle" name="">
+		</div>
+		<!-- 圖 & 文字說明 -->
+		<div class="post-area">
+			<!--Image-->
+			<div class="post-Image">
+				<form action="ActivityPic" method="post"
+					enctype="multipart/form-data" id="uploadPic">
+					<img id="Pic" src="./Images/image.png" />
+				</form>
+			</div>
+			<!-- 文字表單 -->
+			<div class="formfile">
+				<form>
+					<div class="location">
+						<label>地點 :</label>
+						<div class="test-object-normal"></div>
+						<input type="text" id="location" name="location" placeholder="地址">
+					</div>
+					<div>
+						<label for="activityTime">活動時間 :</label> <input
+							type="datetime-local" name="activityTime" id="activityTime"
+							onchange="checkactivityTime()">
+
+					</div>
+					<div>
+						<label for="deadline">最晚審核時間 :</label> <input type="date"
+							class="deadline" name="deadline" id="deadline"
+							onchange="checkdeadline()">
+					</div>
+					<div style="display: flex;">
+						<label for="min">最低人數 :</label> <input
+							class="form-control inputbox" id="min" name="min" type="number"
+							placeholder="最低人數" aria-label="default input example"
+							onchange="checkmin()">
+					</div>
+					<div style="display: flex;">
+						<label for="max">人數上限 :</label> <input
+							class="form-control inputbox" id="max" name="max" type="number"
+							placeholder="人數上限" aria-label="default input example"
+							onchange="checkmax()">
+					</div>
+					<div style="display: flex;">
+						<label for="contact">聯絡方式 :</label> <input
+							class="form-control inputbox" id="contact" name="contact"
+							type="text" placeholder="聯絡方式" aria-label="default input example">
+					</div>
+					<div style="display: flex;">
+						<label for="fee">費用 :</label> <input class="form-control inputbox"
+							id="fee" name="fee" type="text" placeholder="200/人(面)"
+							aria-label="default input example">
+					</div>
+
+					<div class="chooseone">
+						<label>場地預約 :</label>
+						<div class="form-check form-check-inline">
+							<label class="form-check-label" for="inlineRadio1">已預約</label> <input
+								class="form-check-input" id="inlineRadio1"
+								name="inlineRadioOptions" type="radio" value="1">
+						</div>
+						<div class="form-check form-check-inline">
+							<label class="form-check-label" for="inlineRadio2">未預約</label> <input
+								class="form-check-input" id="inlineRadio2"
+								name="inlineRadioOptions" type="radio" value="2">
+						</div>
+					</div>
+
+					<div class="chooseone">
+						<label>等級推薦 :</label>
+
+						<div class="form-check form-check-inline">
+							<label class="form-check-label" for="inlineCheckbox1">初級</label>
+							<input class="form-check-input" type="checkbox"
+								id="inlineCheckbox1" value="初級" name="level">
+						</div>
+						<div class="form-check form-check-inline">
+							<label class="form-check-label" for="inlineCheckbox2">中級</label>
+							<input class="form-check-input" type="checkbox"
+								id="inlineCheckbox2" value="中級" name="level">
+						</div>
+						<div class="form-check form-check-inline">
+							<label class="form-check-label" for="inlineCheckbox3">高級</label>
+							<input class="form-check-input" type="checkbox"
+								id="inlineCheckbox3" value="高級" name="level">
+						</div>
+						<div class="form-check form-check-inline">
+							<label class="form-check-label" for="inlineCheckbox4">專業</label>
+							<input class="form-check-input" type="checkbox"
+								id="inlineCheckbox4" value="專業" name="level">
+						</div>
+					</div>
+					<br>
+					<div class="mb-3">
+						<label for="description" class="form-label">活動說明 :</label>
+						<textarea class="form-control" id="description" name="description"
+							rows="3"></textarea>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="btnGroup">
+			<div class="btn2">
+				<input type="file" onchange="showPic()" target
+					accept="image/jpeg, image/jpg ,image/jpe" id="file">
+				<div>
+					<button id="post" onclick="postActivity()">確認發文</button>
+				</div>
+				<div>
+					<a href="./index.html"><button>取消發文</button></a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+
+        new TwCitySelector();
+        var a = new TwCitySelector({
+            el: '.test-object-normal'
+        });
+
+    </script>
+
+</body>
+
+</html>

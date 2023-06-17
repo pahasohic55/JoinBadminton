@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>活動資料</title>
+    <!-- 響應式網站 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Boostrap 導入程式 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+            crossorigin="anonymous"></script>
+    <!-- 連結CSS外部檔案 -->
+    <link rel="stylesheet" href="./css/post.css">
+    <link rel="stylesheet" href="./css/navbar&footer.css">
+
+
+    <!-- MDB頭像 -->
+    <script type="text/javascript" src="./Js/mdb.min.js"></script>
+
+    <!-- 連結Js外部檔案 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="shortcut icon" href="#"/>
+    <script src="./Js/member.js"></script>
+
+
+</head>
+
+<body>
+<div class="wrapper">
+    <!-- 導覽列 -->
+    <header class="main-header">
+        <div class="container">
+            <a href="./index.html" class="Logo">
+                <img src="./Images/logo3.png" alt="Logo" width="30" height="36">
+                <h2>Join</h2>
+            </a>
+            <!-- 導覽列文字 -->
+            <nav class="navbar-text">
+                <a href="./latestNews.html">最新消息</a>
+                <a href="./findGym.html">附近場館</a>
+                <a href="./post.html">發起揪團</a>
+                <a href="./joinTeam.html">加入報團</a>
+            </nav>
+            <nav class="navbar navbar-expand-lg">
+                <div class="container-fluid">
+                    <ul class="navbar-nav">
+                        <!-- Avatar頭像 -->
+                        <li class="nav-item Avatar dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#"
+                               id="navbarDropdownMenuLink" role="button" data-mdb-toggle="dropdown"
+                               aria-expanded="false">
+                                <img src="./Images/user.png" id="Icon" class="rounded-circle" width="50" height="50"
+                                     alt="Portrait of a Woman" loading="lazy"/>
+                            </a>
+                            <!--sam 20230420 修改 -->
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink" id="dropdown-menu">
+
+                                <li>
+                                    <a class="dropdown-item" onclick="toLogin()" href="./getLogin" id="login">登入</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" onclick="toLogin()" href="./getLogin"
+                                       id="register">註冊</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+         <script> 
+//         $(function () {
+//             //判斷是否為登入狀況，如果是登入狀況，去sessionStroage拿會員的資料，並重新渲染登入等按鈕。
+//             if (checkloginstatus() === "1") {
+//                 let memberObj = sessionStorage.getItem('member');
+//                 let member = JSON.parse(memberObj);
+//                 console.log(member.id);
+//                 console.log(member.Icon);
+//                 if(member.Icon){
+//                     $("#Icon").attr("src", member.Icon); 
+//                 };
+//                 $("#dropdown-menu li").eq(0).find("a").html("會員資料");
+//                 $("#dropdown-menu li").eq(0).find("a").attr("href", "./member.html")
+//                 $("#dropdown-menu li").eq(1).find("a").html("活動");
+//                 $("#dropdown-menu li").eq(1).find("a").attr("href", "./calendar.html")
+//                 console.log("after 登出前")
+//                 $("#dropdown-menu li").eq(1).after("<li><a class='dropdown-item' href='./Logout' onclick='logout()'>登出</a></li>");
+//                 console.log("after 登出後")
+//             }
+
+
+//         })
+
+//         //去檢查是否為登入狀況，檢查sessionStorage是否有isLogin的值
+//         function checkloginstatus() {
+//             console.log("sessionStorage.getItem(isLogin)前")
+//             let isLogin = sessionStorage.getItem("isLogin");
+//             if (isLogin === "1") {
+//                 console.log("sessionStorage.getItem(isLogin)中1")
+//                 return "1";
+
+//             } else {
+//                 console.log("sessionStorage.getItem(isLogin)中2")
+//                 return "0";
+//             }
+//             console.log("sessionStorage.getItem(isLogin)後")
+//         }
+
+//         //將sessionStroage 中的isLogin及member移除，並重新渲染成原本的樣子
+//         function logout() {
+//             // alert("觸發logout");
+//             sessionStorage.removeItem("isLogin");
+//             sessionStorage.removeItem("member");
+//             $("#Icon").attr("src", "./Images/user.png");
+//             $("#dropdown-menu li").eq(0).find("a").html("登入");
+//             $("#dropdown-menu li").eq(0).find("a").attr("href", "./getLogin");
+//             $("#dropdown-menu li").eq(1).find("a").html("註冊");
+//             $("#dropdown-menu li").eq(1).find("a").attr("href", "./getLogin");
+//             $("#dropdown-menu li").eq(2).revome();
+//         }
+
+//         //傳遞資料到login.html，告知是哪一個按鈕超連結到login.html
+//         function toLogin() {
+//             $("#login").on("click", function () {
+//                 sessionStorage.setItem("formIndex", "login")
+//             })
+//             $("#register").on("click", function () {
+//                 sessionStorage.setItem("formIndex", "register")
+//             })
+//         }
+
+
+     </script> 
+    </header>
+    <!-- 揪團框 -->
+    <div class="container-post">
+        <!-- 團名 -->
+        <div class="GroupName">
+            <h1 id="activityTitle"></h1>
+
+        </div>
+        <!-- 圖 & 文字說明 -->
+        <div class="post-area">
+            <!--Image-->
+            <div class="post-Image">
+                <form action="/somewhere/to/upload" enctype="multipart/form-data">
+                    <img id="pic" src="./Images/logo.png"/>
+                </form>
+            </div>
+            <!-- 文字表單 -->
+            <div class="formfile">
+                <form action="">
+                    <div class="location">
+                        <label for="location">地點 :</label>
+                        <span id="location"></span>
+                    </div>
+                    <div>
+                        <label for="activityTime">活動時間 :</label>
+                        <span id="activityTime"></span>
+                    </div>
+                    <div>
+                        <label for="deadline">最晚審核時間 :</label>
+                        <span id="deadline"></span>
+                    </div>
+                    <div style="display: flex;">
+                        <label for="min">最低人數 :</label>
+                        <span id="min"></span>
+                    </div>
+                    <div style="display: flex;">
+                        <label for="max">人數上限 :</label>
+                        <span id="max"></span>
+                    </div>
+                    <div style="display: flex;">
+                        <label for="participation">當前人數 :</label>
+                        <span id="participation"></span>
+                    </div>
+                    <div style="display: flex;">
+                        <label for="contact">聯絡方式 :</label>
+                        <span id="contact"></span>
+                    </div>
+                    <div>
+                        <label>場地預約 :</label>
+                        <span id="reservation"></span>
+                    </div>
+
+                    <div>
+                        <label>等級推薦 :</label>
+                        <span id="level"></span>
+                    </div>
+                    <br>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">活動說明 :</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="joinBtn">
+
+            <div>
+                <button type="button" id="joinBtnId">我要報團</button>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<script>
+    $(function () {
+        //獲取url的參數
+        function getUrlParam(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //創立一個含有目標參數正規表達式的物件
+            var r = window.location.search.substr(1).match(reg);
+            //匹配目標參數
+            if (r != null) return unescape(r[2]);
+            return null; //返回參數
+        }
+
+        //接收URL中的參數id，活動id
+        var id = getUrlParam('id');
+        console.log('id:' + id);
+        $.ajax({
+            type: 'get',
+            url: './viewPostv2',
+            dataType: 'json',
+            success: function (res, status) {
+                console.log(status)
+                //設置當前人數及上限人數為 global variable
+                var participation, max;
+
+                $.each(res, function (idx, val) {
+                    //根據id獲取相對資訊重新渲染到form上面
+                    if (id == val.id) {
+                        $('#activityTitle').text(val.activityTitle);
+                        $('#pic').attr('src', val.pic);
+                        $('#location').text(val.location);
+                        $('#activityTime').text(val.activityTime);
+                        $('#min').text(val.min);
+                        $('#max').text(val.max);
+                        $('#participation').text(val.participation);//當前人數
+                        $('#contact').text(val.contact);
+                        $('#reservation').text(val.reservation == 1 ? '已預約' : '未預約');
+                        $('#level').text(val.level);
+                        $('#description').text(val.description);
+                        $('#deadline').text(val.deadline);
+                        //賦值current & max
+                        participation = val.participation;
+                        max = val.max;
+                        //deadline轉換為日期,currentTime取得當前時間
+                        deadline = new Date(val.deadline);
+                    }
+                });
+                var currentTime = new Date();
+                console.log(deadline);
+                console.log(currentTime);
+                //當前時間大於截止日 disabled掉join button
+                if (currentTime > deadline) {
+                    $("#joinBtnId").prop("disabled", true);
+                    Swal.fire({
+                        title: "本活動報名已截止",
+                        icon: 'info',
+                        showCloseButton: true,
+                        confirmButtonText: '關閉'
+                      });
+                }else{
+                //當前人數大於上限disabled掉join button,並show出活動額滿訊息
+                if (participation >= max) {
+                	console.log(participation);
+                    console.log(max);
+                    $("#joinBtnId").prop("disabled", true);
+                    Swal.fire({
+                        title: "本活動已額滿",
+                        icon: 'info',
+                        showCloseButton: true,
+                        confirmButtonText: '關閉'
+                      });
+                    
+                } else {
+                    $("#joinBtnId").on("click", function () {
+                        //從sessionStorage取得memberId
+                        let memberObj = sessionStorage.getItem("member");
+                        let member = JSON.parse(memberObj);
+                        if(member == null){
+                            window.location.href="./getLogin"
+                        }
+                        if (id !== null) { // Check 活動是否存在
+                            $.ajax({
+                                url: "./joinactivity", //後端接口請補上
+                                type: "POST",
+                                data: {memberId: member.id, id: id},//會員id & 活動id
+                                success: function (data) {
+                                	Swal.fire({
+                                        title: "報名成功",
+                                        icon: 'success',
+                                        showCloseButton: true,
+                                        showConfirmButton: false,
+                                      })
+                                    //刷新
+//                                     window.location.reload();
+
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+                                	Swal.fire({
+                                        title: "您已參加此活動",
+                                        icon: 'warning',
+                                        showCloseButton: true,
+                                        confirmButtonText: '關閉',
+                                      })
+                                }
+                            });
+                        } else {
+                            console.log("活動沒有找到！！！");
+                            Swal.fire({
+                                title: "系統忙碌中,請稍後",
+                                icon: 'warning',
+                                showCloseButton: true,
+                                confirmButtonText: '關閉',
+                              })
+                        }
+                    });
+                }
+            }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error("Error:", textStatus, errorThrown);
+            }
+        });
+    });
+
+</script>
+
+
+</body>
+
+</html>

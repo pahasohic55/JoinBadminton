@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>加入報團</title>
+    <!-- 響應式網站 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Boostrap 導入程式 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+            crossorigin="anonymous"></script>
+    <!-- 連結CSS外部檔案 -->
+    <link rel="stylesheet" href="./css/joinTeam.css">
+    <link rel="stylesheet" href="./css/navbar&footer.css">
+    <link rel="stylesheet" href="./css/sort-button.css">
+    
+
+
+    <!-- 連接Js外部檔案 -->
+
+
+    <!-- MDB頭像 -->
+    <script type="text/javascript" src="./Js/mdb.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   <script	src="https://unpkg.com/isotope-layout@3.0.6/dist/isotope.pkgd.min.js"></script>
+    <script src="./Js/member.js"></script>
+    
+</head>
+
+<body>
+
+<div class="wrapper">
+    <!-- 導覽列 -->
+    <header class="main-header">
+              <div class="container">
+            <a href="./index.html" class="Logo">
+                <img src="./Images/logo3.png" alt="Logo" width="30" height="36">
+                <h2 >Join</h2>
+            </a>
+            <!-- 導覽列文字 -->
+            <nav class="navbar-text">
+                <a href="./latestNews.html">最新消息</a>
+                <a href="./findGym.html">附近場館</a>
+                <a href="./post.html">發起揪團</a>
+                <a href="./joinTeam.html">加入報團</a>
+            </nav>
+            <nav class="navbar navbar-expand-lg">
+                <div class="container-fluid">
+                    <ul class="navbar-nav">
+                        <!-- Avatar頭像 -->
+                        <li class="nav-item Avatar dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#"
+                               id="navbarDropdownMenuLink" role="button" data-mdb-toggle="dropdown"
+                               aria-expanded="false">
+                                <img src="./Images/user.png" id="Icon" class="rounded-circle" width="50" height="50"
+                                     alt="Portrait of a Woman" loading="lazy"/>
+                            </a>
+                            <!--sam 20230420 修改 -->
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink" id="dropdown-menu">
+
+                                <li>
+                                    <a class="dropdown-item" onclick="toLogin()" href="./getLogin" id="login">登入</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" onclick="toLogin()" href="./getLogin"
+                                       id="register">註冊</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </header>
+    
+		<!--filter & sort --> 		
+		
+		<div class ="sortBtn">
+			<h2>過濾器</h2>
+			<div id="filters" class="button-group">
+				<button class="button is-checked" data-filter="*">全部</button>
+				<button class="button" data-filter=".category1">已預約</button>
+				<button class="button" data-filter=".category2">未預約</button>
+			</div>
+
+			<h2>排序</h2>
+			<div id="sorts" class="button-group">
+				<button class="button is-checked" data-sort-by="original-order">活動ID</button>
+				<button class="button" data-sort-by="id">發文時間</button>
+				<button class="button" data-sort-by="activityTime">活動時間</button>
+				<button class="button" data-sort-by="random">亂數洗牌</button>
+			</div>		
+		</div>
+		
+
+		<!--活動卡片 -->
+		<div class="joinTeam-card-group"></div>
+    
+</div>
+	<script>
+	
+    $(function() {$
+        .ajax({
+            type: "get", url: "viewPostv1", dataType: "json", success: function (res) {
+                res.sort(function (a, b) {
+                    // Sort by id                   
+                        return b.id - a.id;
+                    
+                });
+
+                var str = "";
+                $
+                    .each(res, function (idx, val) {
+                        if (idx < 20) {
+                            str += "<div class='grid-item card filtr-item";
+                            if (val.reservation === '1') {
+                                str += " category1";
+                            } else if (val.reservation === '2') {
+                                str += " category2";
+                            }
+                            str += "' style='width: 450px;''><a href='activity.html?id=" + val.id + "'><img src='" + val.pic + "'class='card-img-top' id='" + val.id + "'></a><div class='card-body'><h5 class='card-title'>" + val.activityTitle + "</h5><p class='card-text'>" + val.description + "</p></div>";
+                            str += "<ul class='list-group list-group-flush'><li class='list-group-item'>" + val.activityTime + "</li><li class='list-group-item'>" + val.locationSub + "</li><li class='list-group-item'>" + val.level + "</li></ul>";
+                            str += "<div class='card-body'><img src='" + val.icon + "'style='width: 50px; height:50px; border-radius: 50%;'></a></div></div>";
+                        }
+                    });
+
+                $('.joinTeam-card-group').append(str);
+
+                // Initialize Isotope and set sorting options
+                var $grid = $('.joinTeam-card-group')
+                    .isotope({
+                        itemSelector: '.grid-item', layoutMode: 'fitRows', getSortData: {
+                            activityTitle: '.card-title', // Sort by activity title
+                            id: function (itemElem) { // Sort by ID
+                                return parseInt($(itemElem)
+                                    .find('.card-img-top')
+                                    .attr('id'));
+                            }, activityTime: '.list-group-item:first-child', // Sort by activity time
+                            random: function () { // Sort by random
+                                return Math.random();
+                            }
+                        }, sortBy: 'id' // Set default sort option
+                    });
+
+                // Bind sort button click handlers
+                $('#sorts').on('click', 'button', function () {
+                    var sortByValue = $(this).attr('data-sort-by');
+                    if (sortByValue === 'original-order') {
+                        $grid.isotope('updateSortData');
+                    }
+                    $grid.isotope({
+                        sortBy: sortByValue
+                    });
+                });
+
+                // Bind filter button click handlers
+                $('#filters').on('click', 'button', function () {
+                    var filterValue = $(this).attr('data-filter');
+                    $grid.isotope({
+                        filter: filterValue
+                    });
+                });
+
+                // Set default filter to show all items
+                $grid.isotope({
+                    filter: '*'
+                });
+
+                $('#sorts button').on('click', function () {
+                    $('#sorts button').removeClass('is-checked');
+                    $(this).addClass('is-checked');
+                    var filterValue = $(this).attr('data-filter');
+                    $grid.isotope({
+                        filter: filterValue
+                    });
+                });
+                // add click event listener to all buttons in the #filters div
+                $('#filters button').on('click', function () {
+                    // remove 'is-checked' class from all buttons in the #filters div
+                    $('#filters button').removeClass('is-checked');
+                    // add 'is-checked' class to the clicked button
+                    $(this).addClass('is-checked');
+                });
+
+            }, error: function () {
+                alert(error);
+            }
+        });});
+	</script>
+</body>
+
+</html>

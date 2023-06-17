@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+<meta charset="UTF-8">
+<title>日曆</title>
+<!-- sidebar 導入程式 -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+	rel="stylesheet" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script
+	src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+
+
+<script src="./Js/index.js"></script>
+
+<!-- 連結CSS外部檔案 -->
+
+<script
+	src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/index.global.min.js'></script>
+<script
+	src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.5/locales-all.global.min.js'></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- 連結CSS -->
+<link rel="stylesheet" href="./css/calendarStyle.css">
+<link rel="stylesheet" href="./css/sidebar.css">
+
+<script>
+	//get information from sessionstorage
+	var member = sessionStorage.getItem('member');
+	var memberId = JSON.parse(member);
+	var idValue = memberId.id;
+    document.addEventListener('DOMContentLoaded', async function getActivity() {
+      //get member activity information
+      const response = await $.ajax({
+        type: "POST",
+        url: "./viewcalendarHost",
+        dataType: 'json',
+        data: { "memberId": idValue },
+      });
+      //get event array
+      var event = response.map(activity => ({
+        start: activity.activityTime,
+        extendedProps: {
+          title: activity.activityTitle,
+          location: activity.location,
+          fee: activity.fee,
+          postTime: activity.postTime,
+          contact: activity.contact,
+          participation: activity.participation,
+          description: activity.description,
+          reservation: activity.reservation,
+          deadline: activity.deadline,
+          id: activity.id
+        }
+      }));
+      //fullcalendar
+      var calendarEl = document.getElementById('calendarHost');
+      var calendarHost = new FullCalendar.Calendar(calendarEl, {
+        initialView : 'dayGridMonth',
+        // 語言
+        locale : 'zh-tw',
+        navLink : true,
+      	//活動列數顯示限制
+        dayMaxEventRows: true, 
+        				views: {
+          					timeGrid: {
+           						 dayMaxEventRows: 3 
+          							}
+        						},
+        selectable : true,
+        // 依瀏覽器視窗變動
+        handleWindowResize : true,
+        // 顯示現在
+        nowIndicator : true,
+        //上排選項
+        headerToolbar : {
+          left : 'dayGridMonth,timeGridWeek,timeGridDay',
+          center : 'title',
+          right : 'today,prev,next'
+        },
+        //活動
+        events: event,
+        //活動點擊
+        eventClick:
+                function(info) {
+                  var reservation = "";
+                  switch(info.event.extendedProps.reservation) {
+                    case "1":
+                      reservation = "已預約";
+                      break;
+                    case "2":
+                      reservation = "未預約";
+                      break;
+                    default:
+                      reservation = "尚未設定";
+                      break;
+                  };
+                //超過活動開始時間按鈕無效
+                  var getDate = (new Date());
+//                   console.log(typeof getDate);
+//                   console.log(getDate);
+// 				  console.log(deadline);
+// 				  console.log(typeof deadline);
+                  var i = new Boolean(false);
+                  if (getDate < info.event.start){
+                  	i = true;
+                  }else{
+                  	i = false;
+                  };
+//                   console.log(typeof info.event.start);
+//                   console.log(info.event.start.toString());
+//                   console.log(i);
+                  Swal.fire({
+       		        title: "" + info.event.extendedProps.location +"",
+       		        html:  
+       		        	"活動名稱 : "+ info.event.extendedProps.title +"<br>"+
+       		            "聯絡方式 : "+ info.event.extendedProps.contact+"<br>"+
+       		            "費用 : " + info.event.extendedProps.fee+"<br>"+
+       		            "發文時間 : " + info.event.extendedProps.postTime+"<br>"+
+       		            "加入人數 : " + info.event.extendedProps.participation+"<br>"+
+       		            "發文說明 : " + info.event.extendedProps.description+"<br>"+
+       		            "預約狀況 : " + reservation+"<br>"+
+       		         	"可更改時間至 : " + info.event.extendedProps.deadline+"<br>",
+       		        showCloseButton: true,
+       		        showCancelButton: true,
+       		        showDenyButton: i, 
+       		        confirmButtonText: '參與狀況',
+      		        denyButtonText: '變更活動',
+       		        cancelButtonText: '關閉',
+       		        showLoaderOnConfirm: true,
+       		    }).then(function(result){
+       		    	if (result.isConfirmed){
+       		    		$.ajax({
+   		                    type: "POST",
+   		                    url: "./searchActivityInfo",
+   		                    dataType: 'json',
+   		                    data: {
+//    		                        memberId: idValue, 
+   		                        id: info.event.extendedProps.id
+   		                    },
+   		                    success: function(response) {
+   		                        // 成功可看到參與人數及會員名稱
+   		                        console.log("success");
+   		                        console.log(response);
+//    		                     	console.log(response.length)
+								const memberNames = [];
+								for (let i = 0; i < response.length; i++) {
+  									memberNames.push(response[i].memberName);
+//   									console.log(memberNames);
+										}
+								const listItems = memberNames.map((name) => `${name}<br>`).join("");
+   		                       Swal.fire({
+		                                title: '活動:'+response[0].activityTitle + '',
+		                                html:  '<strong>'+'目前參與人數:'+'</strong>'+response[0] .participation+ '<br>'
+		                                +'<strong>'+'參與人:' +'</strong>'+'<br>'+ `${listItems}`,
+		                                confirmButtonText: '關閉',
+		                             	showCloseButton: true,
+		                            })
+		                            },
+   		                    error: function(error) {
+   		                    	console.log("error");
+   		                        console.log(error);
+   		                       	Swal.fire({
+		                                title: '請再試一次或重整頁面',
+		                                icon: 'error',
+		                                confirmButtonText: '關閉',
+		                                showCloseButton: true
+		                            })
+   		                    }
+   		                });
+       		    		}else if (result.isDenied){
+       		    			Swal.fire({
+       		    				text:"活動更改後將無法還原",
+       		    				icon:'warning',
+           		    			showCloseButton: true,
+                   		        showCancelButton: true,
+                   		        showDenyButton: true, 
+                   		        confirmButtonText: '刪除活動',
+                  		        denyButtonText: '更改為已預約',
+                  		        cancelButtonText: '關閉',
+                   		        showLoaderOnConfirm: true,
+           		    		}).then(function(resultChange){
+       		    	if (resultChange.isConfirmed){
+							//刪除已發起的活動
+                   		                $.ajax({
+                   		                    type: "POST",
+                   		                    url: "./deleteActivity",
+                   		                    dataType: 'text',
+                   		                    data: {
+                   		                        memberId: idValue,
+                   		                        id: info.event.extendedProps.id
+                   		                    },
+                   		                    success: function(response) {
+                   		                        // 成功時取消活動
+                   		                        console.log("success");
+                   		                        console.log(response);
+                   		                       Swal.fire({
+             		                                title: '成功刪除活動:'+info.event.title + "",
+             		                                text: '請注意信箱是否有收到活動取消通知',
+             		                                icon: 'success',
+             		                                confirmButtonText: '關閉',
+             		                             	showCloseButton: true,
+             		                            }).then(function(result){
+             		                                if(result.isDismissed == true || result.isConfirmed == true){
+             		                                	//刷新當前頁面
+             		                                	window.location.reload();
+             		                                }
+             		                            })
+             		                            },
+                   		                    error: function(error) {
+                   		                    	console.log("error");
+                   		                        console.log(error);
+                   		                       	Swal.fire({
+              		                                title: '請再試一次或重整頁面',
+              		                                icon: 'error',
+              		                                confirmButtonText: '關閉',
+              		                                showCloseButton: true
+              		                            })
+                   		                    }
+                   		                });
+						}else if (resultChange.isDenied){
+							    			//更改為已預約
+                       		                $.ajax({
+                       		                    type: "POST",
+                       		                    url: "./changeReservation",
+                       		                    dataType: 'text',
+                       		                    data: {
+                       		                        memberId: idValue,
+                       		                        id: info.event.extendedProps.id
+                       		                    },
+                       		                    success: function(response) {
+                       		                        console.log("success");
+                       		                        console.log(response);
+                       		                       Swal.fire({
+                 		                                title: '成功將活動:'+info.event.title +"更改為已預約",
+                 		                                icon: 'success',
+                 		                                confirmButtonText: '關閉',
+                 		                             	showCloseButton: true
+                 		                            }).then(function(result){
+                 		                                if(result.isDismissed == true || result.isConfirmed == true){
+                 		                                	//刷新當前頁面
+                 		                                	window.location.reload();
+                 		                                }
+                 		                            })
+                 		                            },
+                       		                    error: function(error) {
+                       		                    	console.log("error");
+                       		                        console.log(error);
+                       		                       	Swal.fire({
+                  		                                title: '請再試一次或重整頁面',
+                  		                                icon: 'error',
+                  		                                confirmButtonText: '關閉',
+                  		                                showCloseButton: true
+                  		                            })
+                       		                    }
+                       		                });
+						}
+					});
+       		    	}
+       		    })
+       		}
+			//eventclickend	 
+      });
+// 		console.log(event);
+      // 渲染
+      calendarHost.render();
+    });
+  </script>
+</head>
+
+<body>
+	<div id="wrapper">
+		<div class="overlay"></div>
+
+		<!-- Sidebar導覽列 -->
+		<nav class="navbar navbar-inverse fixed-top" id="sidebar-wrapper"
+			role="navigation">
+			<ul class="nav sidebar-nav">
+				<div class="sidebar-header">
+					<img src="./Images/logo3.png" alt="">
+					<div class="sidebar-brand">
+						<a href="./index.html">Join揪羽球</a>
+					</div>
+				</div>
+				<li><a href="./index.html">首頁</a></li>
+				<li><a href="./member.html">會員資料</a></li>
+
+
+				<li class="dropdown"><a href="" class="dropdown-toggle"
+					data-toggle="dropdown">活動<span class="caret"></span></a>
+					<ul class="dropdown-menu animated fadeInLeft" role="menu">
+						<div class="dropdown-header">所有活動</div>
+						<li><a href="./calendar.html">日曆</a></li>
+						<li><a href="./participate.html">我報名的活動</a></li>
+						<li><a href="./launch.html">我發起的活動</a></li>
+					</ul></li>
+				
+			</ul>
+		</nav>
+		<!-- /#sidebar-wrapper -->
+
+		<!-- Page Content -->
+		<div id="page-content-wrapper">
+			<!-- 漢堡按鈕 -->
+			<button type="button" class="hamburger animated fadeInLeft is-closed"
+				data-toggle="offcanvas">
+				<span class="hamb-top"></span> <span class="hamb-middle"></span> <span
+					class="hamb-bottom"></span>
+			</button>
+			<div class="container-calendar">
+				<div class="calendar">
+					<div class="container">
+						<!-- 放入網頁 -->
+						<div id='calendarHost'></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	</div>
+</body>
+</html>
